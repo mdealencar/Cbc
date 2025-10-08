@@ -50,11 +50,6 @@ jobs:
           path: coinbrew
       - name: Set up msbuild
         uses: microsoft/setup-msbuild@v2
-      - name: Set up vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          runVcpkgInstall: true
-          vcpkgJsonGlob: '**/vcpkg.json'
       - name: Set up msys for coinbrew
         uses: msys2/setup-msys2@v2
         with:
