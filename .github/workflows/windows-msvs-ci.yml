@@ -50,6 +50,8 @@ jobs:
           path: coinbrew
       - name: Set up msbuild
         uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
       - name: Set up msys for coinbrew
         uses: msys2/setup-msys2@v2
         with:
@@ -73,6 +75,7 @@ jobs:
       - name: Build project
         shell: cmd
         run: |
+          vcpkg --version
           msbuild ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}.sln /t:ClCompile /p:VcpkgEnableManifest=true /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m
           mklink ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\lib\pthread.lib ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\lib\pthreadVC3.lib
           mklink ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\bin\pthread.dll ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\bin\pthreadVC3.dll
