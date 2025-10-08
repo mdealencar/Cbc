@@ -46,7 +46,6 @@ jobs:
       - name: Checkout coinbrew
         uses: actions/checkout@v5
         with:
-          filter: coinbrew
           repository: coin-or/coinbrew
           path: coinbrew
       - name: Set up msbuild
