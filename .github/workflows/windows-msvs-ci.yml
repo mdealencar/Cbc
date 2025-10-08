@@ -40,12 +40,13 @@ jobs:
           echo Package suffix - '${{ env.package_suffix }}'
           if "${{ env.output_dir }}"=="" echo ERROR - No output_dir set, possibly unsupported platform '${{ matrix.platform }}'. Expecting x64 or x86. && exit 1
       - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          path: ${{ github.event.repository.name }}
+        uses: actions/checkout@v5
+        # with:
+        #   path: ${{ github.event.repository.name }}
       - name: Checkout coinbrew
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
+          filter: coinbrew
           repository: coin-or/coinbrew
           path: coinbrew
       - name: Set up msbuild
@@ -72,13 +73,24 @@ jobs:
           if [ -d "./Data/Miplib3/" ]; then gunzip ./Data/Miplib3/*.gz; fi
           echo "##################################################"       
         shell: msys2 {0}
-      - name: Build project
+      - name: setup vcpkg
         shell: cmd
         run: |
-          vcpkg --version
+          vcpkg new --application
+          vcpkg add port pthreads
+          dir
+      - name: Compile project
+        shell: cmd
+        run: |
           msbuild ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}.sln /t:ClCompile /p:VcpkgEnableManifest=true /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m
+      - name: Make pthread links to pthreadVC3
+        shell: cmd
+        run: |
           mklink ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\lib\pthread.lib ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\lib\pthreadVC3.lib
           mklink ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\bin\pthread.dll ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\bin\pthreadVC3.dll
+      - name: Link project
+        shell: cmd
+        run: |
           msbuild ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}.sln /p:VcpkgEnableManifest=true /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m
       - name: Test project
         shell: cmd
