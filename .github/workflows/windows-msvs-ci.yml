@@ -41,8 +41,8 @@ jobs:
           if "${{ env.output_dir }}"=="" echo ERROR - No output_dir set, possibly unsupported platform '${{ matrix.platform }}'. Expecting x64 or x86. && exit 1
       - name: Checkout source
         uses: actions/checkout@v5
-        # with:
-        #   path: ${{ github.event.repository.name }}
+        with:
+          path: ${{ github.event.repository.name }}
       - name: Checkout coinbrew
         uses: actions/checkout@v5
         with:
@@ -55,7 +55,7 @@ jobs:
       - name: Set up msys for coinbrew
         uses: msys2/setup-msys2@v2
         with:
-          update: true
+          update: false
           install: >-
             git
             zip
