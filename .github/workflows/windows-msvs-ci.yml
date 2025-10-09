@@ -121,7 +121,7 @@ jobs:
         run: |
           echo "${{ env.THIRD_PARTY_NOTICES }}" > ThirdPartyNotices.txt
           mkdir LICENSES
-          cp vcpkg_installed/x64-windows/vcpkg/pkgs/pthreads_x64-windows/share/pthreads/copyright LICENSES/Apache-2.0.txt
+          wget -o LICENSES/Apache-2.0.txt https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/LICENSE
           mkdir NOTICES
           wget -o NOTICES/CONTRIBUTORS_pthreads4w https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/CONTRIBUTORS
       - name: Install project
