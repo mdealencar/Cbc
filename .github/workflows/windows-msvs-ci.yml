@@ -129,7 +129,7 @@ jobs:
         run: |
           mkdir dist
           cp ${{ github.event.repository.name }}/{README,AUTHORS,LICENSE}* dist
-          cp ThirdPartyNotices.txt LICENSES NOTICES dist
+          cp -r ThirdPartyNotices.txt LICENSES NOTICES dist
           mkdir dist/bin
           cp ${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ env.output_dir }}/*.exe dist/bin
           cp vcpkg_installed/x64-windows/x64-windows/bin/pthreadVC3.dll dist/bin
