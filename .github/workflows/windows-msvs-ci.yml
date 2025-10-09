@@ -129,7 +129,7 @@ jobs:
         shell: msys2 {0}
         run: |
           mkdir dist
-          cp "${{ github.event.repository.name }}/{README,AUTHORS,LICENSE}*" dist
+          cp "${{ github.event.repository.name }}"/{README,AUTHORS,LICENSE}* dist
           cp -r ThirdPartyNotices.txt LICENSES NOTICES dist
           mkdir dist/bin
           cp "${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ env.output_dir }}/*.exe" dist/bin
