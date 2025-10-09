@@ -30,7 +30,7 @@ env:
     
     This product includes software developed through the colaborative
     effort of several individuals, each of whom is listed in the file
-    NOTICES\CONTRIBUTORS_pthreads4w included with this software.
+    NOTICES/CONTRIBUTORS_pthreads4w included with this software.
 
 jobs:
   test:
@@ -42,7 +42,7 @@ jobs:
         include: [
           # Only os: windows-2022 has Visual Studio 2022 (v17) installed with toolset v143, which is required.
           # configuration: "Release" or "Debug", platform: "x86" or "x64". See solution Configuration Manager.
-          # { os: windows-2022, configuration: "Debug", platform: "x64" },
+          { os: windows-2022, configuration: "Debug", platform: "x64" },
           { os: windows-2025, configuration: "ReleaseParallel", platform: "x64" }
         ]
     steps:
@@ -112,10 +112,10 @@ jobs:
         shell: cmd
         run: |
           msbuild "${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ github.event.repository.name }}.sln" -p:VcpkgEnableManifest=true -p:Configuration=${{ matrix.configuration }} -p:Platform=${{ matrix.platform }} -m
-      # - name: Test project
-      #   shell: cmd
-      #   run: |
-      #     "./${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ github.event.repository.name }}Test.cmd" "./${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ env.output_dir }}" "./Data/Sample" "./Data/Netlib" "./Data/Miplib3"
+      - name: Test project
+        shell: cmd
+        run: |
+          "./${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ github.event.repository.name }}Test.cmd" "./${{ github.event.repository.name }}/${{ github.event.repository.name }}/MSVisualStudio/v17/${{ env.output_dir }}" "./Data/Sample" "./Data/Netlib" "./Data/Miplib3"
       - name: Put together legalese for third party components
         # the content of file NOTICE from pthreads4w goes into ThirdPartyNotices.txt, but it references CONTRIBUTORS
         shell: msys2 {0}
