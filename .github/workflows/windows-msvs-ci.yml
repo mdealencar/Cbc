@@ -79,6 +79,7 @@ jobs:
           install: >-
             git
             zip
+            rsync
           path-type: inherit
           msystem: mingw64
       - name: Fetch project
