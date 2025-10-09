@@ -125,7 +125,7 @@ jobs:
           mkdir NOTICES
           wget -o NOTICES/CONTRIBUTORS_pthreads4w https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/CONTRIBUTORS
       - name: Install project
-        shell: msys2
+        shell: msys2 {0}
         run: |
           mkdir dist
           cp ${{ github.event.repository.name }}/{README,AUTHORS,LICENSE}* dist
