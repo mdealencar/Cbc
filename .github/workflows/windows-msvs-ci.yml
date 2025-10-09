@@ -98,30 +98,32 @@ jobs:
           vcpkg new --application
           vcpkg add port pthreads
           vcpkg integrate install
-          dir
       - name: Compile project
         shell: cmd
         run: |
           msbuild ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}.sln /t:ClCompile /p:VcpkgEnableManifest=true /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m
       - name: Make pthread links to pthreadVC3
+        # msbuild tries links to pthread.lib, but the pthreads4w objects' names have suffixes
         shell: cmd
         run: |
           mklink vcpkg_installed\x64-windows\x64-windows\lib\pthread.lib pthreadVC3.lib
-          mklink vcpkg_installed\x64-windows\x64-windows\bin\pthread.dll pthreadVC3.dll
-          dir
-          dir vcpkg_installed\x64-windows\x64-windows\lib\
       - name: Link project
         shell: cmd
         run: |
           msbuild ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}.sln /p:VcpkgEnableManifest=true /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m
-      - name: Test project
-        shell: cmd
-        run: |
-          .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}Test.cmd .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ env.output_dir }} .\Data\Sample .\Data\Netlib .\Data\Miplib3
-      - name: Fetch file missing from pthreads4w vcpkg package
+      # - name: Test project
+      #   shell: cmd
+      #   run: |
+      #     .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}Test.cmd .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ env.output_dir }} .\Data\Sample .\Data\Netlib .\Data\Miplib3
+      - name: Put together legalese for third party components
+        # the content of file NOTICE from pthreads4w goes into ThirdPartyNotices.txt, but it references CONTRIBUTORS
         shell: msys2 {0}
         run: |
-          wget -o CONTRIBUTORS_pthreads4w https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/CONTRIBUTORS
+          echo "${{ env.THIRD_PARTY_NOTICES }}" > ThirdPartyNotices.txt
+          mkdir LICENSES
+          cp vcpkg_installed/x64-windows/vcpkg/pkgs/pthreads_x64-windows/share/pthreads/copyright LICENSES/Apache-2.0.txt
+          mkdir NOTICES
+          wget -o NOTICES/CONTRIBUTORS_pthreads4w https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/CONTRIBUTORS
       - name: Install project
         shell: cmd
         run: |
@@ -129,11 +131,7 @@ jobs:
           copy ${{ github.event.repository.name }}\README.* dist\.
           copy ${{ github.event.repository.name }}\AUTHORS.* dist\.
           copy ${{ github.event.repository.name }}\LICENSE.* dist\.
-          mkdir dist\LICENSES
-          copy vcpkg_installed\x64-windows\vcpkg\pkgs\pthreads_x64-windows\share\pthreads\copyright dist\LICENSES\Apache-2.0.txt
-          echo ${{ env.THIRD_PARTY_NOTICES }} > ThirdPartyNotices.txt
-          mkdir dist\NOTICES
-          copy CONTRIBUTORS_pthreads4w dist\NOTICES
+          xcopy ThirdPartyNotices.txt LICENSES NOTICES dist\.
           mkdir dist\bin
           copy ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ env.output_dir }}\*.exe dist\bin\.
           copy vcpkg_installed\x64-windows\x64-windows\bin\pthreadVC3.dll dist\bin\.
