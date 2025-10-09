@@ -12,6 +12,26 @@ on:
     types:
       - created
 
+env:
+  THIRD_PARTY_NOTICES: |
+    THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+    
+    This distribution includes third‑party software components subject to the licenses and notices listed below. 
+    “The contents of the NOTICE file are for informational purposes only and do not modify the License.” 
+    (Excerpted from the Apache License 2.0 notice guidance.)
+    
+    ----------------------------------------------------------------------
+    Component: PThreads4W - POSIX threads for Windows
+    License: Apache-2.0
+    Copyright: (c) 1998 John E. Bossom, 1999-2018 Pthreads4w contributors
+    Source files: https://github.com/jwinarske/pthreads4w
+    Attribution: This package includes threadsVC3.dll object code thanks to the Pthreads4w contributors.
+    Full license text: see LICENSES/Apache-2.0.txt
+    
+    This product includes software developed through the colaborative
+    effort of several individuals, each of whom is listed in the file
+    NOTICES\CONTRIBUTORS_pthreads4w included with this software.
+
 jobs:
   test:
     name: Run tests
@@ -62,6 +82,7 @@ jobs:
           path-type: inherit
           msystem: mingw64
       - name: Fetch project
+        shell: msys2 {0}
         run: |
           ADD_ARGS=()
           ADD_ARGS+=( --skip='ThirdParty/Metis ThirdParty/Mumps ThirdParty/Blas ThirdParty/Lapack' )
@@ -71,7 +92,6 @@ jobs:
           if [ -d "./Data/Netlib/" ]; then gunzip ./Data/Netlib/*.gz; fi
           if [ -d "./Data/Miplib3/" ]; then gunzip ./Data/Miplib3/*.gz; fi
           echo "##################################################"       
-        shell: msys2 {0}
       - name: setup vcpkg
         shell: cmd
         run: |
@@ -98,6 +118,10 @@ jobs:
         shell: cmd
         run: |
           .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ github.event.repository.name }}Test.cmd .\${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ env.output_dir }} .\Data\Sample .\Data\Netlib .\Data\Miplib3
+      - name: Fetch file missing from pthreads4w vcpkg package
+        shell: msys2 {0}
+        run: |
+          wget -o CONTRIBUTORS_pthreads4w https://github.com/jwinarske/pthreads4w/raw/refs/heads/cmake/CONTRIBUTORS
       - name: Install project
         shell: cmd
         run: |
@@ -105,9 +129,14 @@ jobs:
           copy ${{ github.event.repository.name }}\README.* dist\.
           copy ${{ github.event.repository.name }}\AUTHORS.* dist\.
           copy ${{ github.event.repository.name }}\LICENSE.* dist\.
+          mkdir dist\LICENSES
+          copy vcpkg_installed\x64-windows\vcpkg\pkgs\pthreads_x64-windows\share\pthreads\copyright dist\LICENSES\Apache-2.0.txt
+          echo ${{ env.THIRD_PARTY_NOTICES }} > ThirdPartyNotices.txt
+          mkdir dist\NOTICES
+          copy CONTRIBUTORS_pthreads4w dist\NOTICES
           mkdir dist\bin
           copy ${{ github.event.repository.name }}\${{ github.event.repository.name }}\MSVisualStudio\v17\${{ env.output_dir }}\*.exe dist\bin\.
-          copy ${{ github.event.repository.name }}\vcpkg_installed\x64-windows\x64-windows\bin\pthreadVC3.dll dist\bin\.
+          copy vcpkg_installed\x64-windows\x64-windows\bin\pthreadVC3.dll dist\bin\.
           mkdir dist\share
           if exist .\Data\Sample xcopy .\Data\Sample dist\share\coin-or-sample /i
           if exist .\Data\Netlib xcopy .\Data\Netlib dist\share\coin-or-netlib /i
